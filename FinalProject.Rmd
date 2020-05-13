@@ -1,0 +1,21 @@
+---
+title: "FinalProject"
+author: "Ajay Karatam"
+date: "5/13/2020"
+output: html_document
+---
+
+## Dataframe Setup and Tidying
+```{r setup}
+library(tidyverse)
+library(lubridate)
+csv_file <- "HRR_Scorecard.csv"
+hcb <- read_csv(csv_file)
+
+df <- hcb %>%
+  
+  
+  
+  
+```
+
