@@ -6,6 +6,10 @@ output: html_document
 ---
 
 ## Dataframe Setup and Tidying
+
+## Tasks: 
+
+## 1. Remove the First Row that states that the dataset is based on a 50 percent reduction in occupancy.
 ```{r setup}
 library(tidyverse)
 library(lubridate)
