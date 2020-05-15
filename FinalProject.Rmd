@@ -1,18 +1,38 @@
 ---
 title: "FinalProject"
-author: "Ajay Karatam"
+author: "Ajay Karatam and Michael Rothschilds"
 date: "5/13/2020"
 output: html_document
 ---
+## An Analysis of U.S Hospital Bed Capacity During the COVID-19 Pandemic
+by Michael Rothschilds and Ajay Karatam
+
+## Introduction: 
+The COVID-19 pandemic has altered the lives of millions over the past few months. 
+People have practiced Social Distancing at an unprecedented level with the intention 
+of keeping people safe and "flattening the curve". The purpose of "flattening the curve" 
+is to prevent hospitals from being overun with too many COVID-19 patients at once. 
+In order to stop this from happening, public health and government officials need to 
+project the number of cases, the rate of hospitilization, and the resulting number of 
+hospital and ICU beds needed at any given time across all areas of the United States. 
+The following data was collected from a team of researchers at the Harvard Global Data Institute. 
+They made projections for different infection rates and used surveys conducted by 
+The American Hospital Association to predict the true availability of hospital and ICU beds.
+
+## Examine the original dataset here: 
+https://www.kaggle.com/mrmorj/hospital-bed-capacity-and-covid19
+
+## R Libraries Used
+``` {r libraries}
+library(tidyverse)
+library(lubridate)
+```
+
+
 
 ## Dataframe Setup and Tidying
 
-## Tasks: 
-
-## 1. Remove the First Row that states that the dataset is based on a 50 percent reduction in occupancy.
 ```{r setup}
-library(tidyverse)
-library(lubridate)
 csv_file <- "HRR_Scorecard.csv"
 hcb <- read_csv(csv_file)
 
