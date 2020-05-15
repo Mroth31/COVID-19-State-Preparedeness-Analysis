@@ -16,8 +16,13 @@ library(lubridate)
 csv_file <- "HRR_Scorecard.csv"
 hcb <- read_csv(csv_file)
 
+#delete the first entry since it contains garbage values
+hcb = hcb[-1,]
 df <- hcb %>%
-  
+  #choose the relevant columns that we want to work with from hcb 
+    select(1:12) %>%
+    
+df
   
   
   
