@@ -40,11 +40,28 @@ hcb <- read_csv(csv_file)
 hcb = hcb[-1,]
 df <- hcb %>%
   #choose the relevant columns that we want to work with from hcb 
-    select(1:12) %>%
-    
+  select(1:12)
 df
-  
-  
-  
+#extract the state as a separate column from HRR
+df$State <- str_extract(df$HRR, "([A-Z]{2})")
+
+#extract the town as a separate column from HRR
+df$Town <- str_extract (df$HRR, "[A-Za-z]+")
+
+#re-arrange the columns to make the data more presentable
+df <- df[c(14,13,2,4,5,3,6,7,8,9,10,11,12)]
+
+#calculate the percentage of occupied hospital beds
+df$calc_hospital = ((df[c(4)] / df[c(3)])*100)
+df$`Occupied Hospital Beds percentage` <- round(df$calc_hospital$`Available Hospital Beds`,digits=2) 
+
+#calculate the percent of occupied ICU beds
+df$calc_ICU = ((df[c(7)] / df[c(6)])*100)
+df$`Occupied ICU Beds percentage` <- round(df$calc_ICU$`Available ICU Beds`, digits=2)
+
+#final columns re-arrangement
+df <- df[c(1,2,3,4,5,15,6,7,8,17,9,10,11,12,13)]
 ```
+
+
 
