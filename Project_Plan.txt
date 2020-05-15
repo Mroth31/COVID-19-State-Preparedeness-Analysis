@@ -1,0 +1,31 @@
+Project Plan
+
+What's done so far - 
+Data Planning, Scraping, Management
+
+What are we trying to show/convey with our analysis?
+- A detailed analysis by state 
+
+Call Discussion
+ - We decided to create two new dataframes
+    A. This data frame will start off by combining all the data from the columns for every region per state.
+        Timeline
+        1)Total up the hospital/ICU beds columns including predicted
+        2)Create a new column that counts how many regions are in each state (should ideally end up with a 50 
+            entry dataframe)
+        3)Perform data analysis on this by showling a linear regression model and a ggplot for top 10 states.
+        4)Mimic the same setup and analysis for both Hospital and ICU.
+    
+    B. This data frame will focus on the general population
+        Timeline
+        1)We want to create a new data frame with population focusing on infected individuals including other 
+            factors like ages >65. Calculate a doomsday scenario where 50% of adults are infected and make 
+            projections with reference to the original dataframe to come to this calculation.
+        2)Now use this data to create a linear regression model and use machine learning to show future analysis.
+        3)Based on this data we can use leaflet using a map of the US and color pin the states based on current
+            scenario and once again create another leaflet plot to show the doomsday scenario.
+            Ideally we would want to have the radius increase for states showing higher risks.
+
+Things we still need to figure out
+- The bridge between part A analysis and part B analysis.
+- The machine learning setup for part B.
