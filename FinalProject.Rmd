@@ -193,3 +193,15 @@ states_pop_df %>%
   
   
 ```  
+
+## Top 10 States Most at Risk Based on the sum of Total Adult Population / Projected Hospitilizations and Elderly Population / Adult Population 
+
+``` {r mostatriskstates}
+states_pop_df <- states_pop_df %>% 
+  mutate(Risk_Level = (Projected_Hospitalized_Individuals + `Population 65+`) / Adult_Population) %>%
+  arrange(desc(Risk_Level)) %>%
+  slice(1:10)
+
+selectstates_pop_df
+
+```
