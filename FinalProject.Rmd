@@ -168,3 +168,16 @@ states_pop_df %>%
   labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", y="Number of Adults")
   
 ```
+
+## Doomsday Plot:
+I would like to depict the differences in projected hospitilizations in the doomsday scenario for each state.
+
+``` {r doomsdayplot}
+states_pop_df %>%
+  mutate(difference_in_hospitilzations = Doomsday_Projected_Hospitalized_Individuals - Projected_Hospitalized_Individuals) %>%
+  ggplot(mapping=aes(x = difference_in_hospitilzations, y= Adult_Population, color= State))+
+  geom_point()+
+  labs(title = "Difference in Projected Hospitilizations in Each State", x="Difference", y="Number of Adults")
+  
+  
+```  
