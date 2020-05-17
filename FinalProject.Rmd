@@ -62,7 +62,7 @@ df$`Occupied ICU Beds percentage` <- round(df$calc_ICU$`Available ICU Beds`, dig
 #final columns re-arrangement
 df <- df[c(1,2,3,4,5,15,6,7,8,17,9,10,11,12,13)]
 ```
-## Section:
+## Population Data Frame:
 Create a data frame focusing on the estimated COVID-19 General Population Data. 
 Take the Region data and turn it into statewide data. 
 Once we have statewide data, we multiply the Projected infections, hospitalizations, 
