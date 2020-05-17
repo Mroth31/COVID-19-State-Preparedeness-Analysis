@@ -28,6 +28,7 @@ library(tidyverse)
 library(lubridate)
 library(dplyr)
 library(broom)
+library(leaflet)
 ```
 
 
@@ -223,11 +224,6 @@ merge_df <- merge_df %>%
                           ((`Rate of Hospital beds availability`/100) + 
                           (`Rate of ICU beds availability`/100)) *.70)*100)
 
-lm_df <- merge_df %>%
-    select(1, 2, 6, 10, 13, 16, 19)%>%
-    arrange(merge_df$Preparedness_Score)
-lm_df
-
 fit_df <- select(merge_df, State, `Rate of Hospital beds availability`, 
 `Rate of ICU beds availability`, Adult_Population, `Population 65+`, Preparedness_Score)
 
@@ -248,10 +244,41 @@ ggplot(lm_df, mapping=aes(x=lm_df$residuals , y=lm_df$fitted.values))+
     geom_point(mapping=aes(color = lm_df$data$State))+
     geom_smooth(method=lm)+
     labs(title="Linear Regression model of Residuals over fitted values",
-        x = "Fitted values",
-         y = "Residuals",
+        x = "Residuals",
+         y = "Fitted Values",
         color = "State")
 
-# Reached 124 lines of code
+# Reached 120 lines of code
+
+fit_df$fitted_values <- lm_df$fitted.values
+
 ```
+
+```{r map}
+#https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
+csv_file <- "statelatlong.csv"
+sll <- read_csv(csv_file)
+
+map_df <- merge(sll, fit_df, by = "State")
+
+map_df$Preparedness_Score = round(map_df$Preparedness_Score, digits = 2)
+map_df$Preparedness_Score = as.character(map_df$Preparedness_Score)
+map_df$Preparedness_Score = paste("Preparedness Score = ", map_df$Preparedness_Score)
+
+
+pal <- colorFactor(c("red", "orange", "yellow", "green", "blue"), domain = c(map_df$fitted_values))
+
+prep_map <- leaflet(map_df) %>%
+  addTiles() %>%
+  setView(lat=39.29, lng=-76.61, zoom=4) %>%
+  addCircleMarkers(radius = ~map_df$fitted_values/2.2, popup = map_df$Preparedness_Score,
+                   color = ~pal(map_df$fitted_values), fillOpacity = 0.8)
+
+prep_map
+
+
+```
+```
+
+
 
