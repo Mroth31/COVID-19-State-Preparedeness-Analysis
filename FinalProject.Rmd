@@ -110,6 +110,36 @@ beds_df$`Rate of ICU beds availability` = round(beds_df$`Rate of ICU beds availa
   
   
 ```
+
+
+
+
+```{r plot analysis icu}
+  icu_df <- beds_df %>%
+    select(1,2,7,8,9,10)%>%
+    group_by(State, `No. of Regions`)%>%
+    arrange(`Rate of ICU beds availability`)
+  icu_df
+  
+  ggplot(icu_df, mapping=aes(x=`Total ICU Beds`, y=`ICU Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    ggtitle("Scatter plot of ICU Beds Occupied vs Available")
+  
+  icu_df[1:10,] %>%
+    ggplot(mapping=aes(x=State, y=`Rate of ICU beds availability`, fill= `No. of Regions`))+
+    geom_col(mapping=aes())+
+    ggtitle("Top 10 States with the Lowest Rate of ICU Beds Availability")
+  
+  ggplot(icu_df, mapping=aes(x=`Potential ICU Beds Available`, y=`ICU Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    geom_smooth(method=lm)+
+    ggtitle("Linear Regression Model of ICU: Potential Available Beds vs Available Beds")
+  
+```
+
+
+
+
 ## Population Data Frame:
 Create a data frame focusing on the estimated COVID-19 General Population Data. 
 Take the Region data and turn it into statewide data. 
@@ -138,32 +168,3 @@ states_pop_df %>%
   labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", y="Number of Adults")
   
 ```
-
-
-
-
-
-
-```{r plot analysis icu}
-  icu_df <- beds_df %>%
-    select(1,2,7,8,9,10)%>%
-    group_by(State, `No. of Regions`)%>%
-    arrange(`Rate of ICU beds availability`)
-  icu_df
-  
-  ggplot(icu_df, mapping=aes(x=`Total ICU Beds`, y=`ICU Beds Available`))+
-    geom_point(mapping=aes(color = State))+
-    ggtitle("Scatter plot of ICU Beds Occupied vs Available")
-  
-  icu_df[1:10,] %>%
-    ggplot(mapping=aes(x=State, y=`Rate of ICU beds availability`, fill= `No. of Regions`))+
-    geom_col(mapping=aes())+
-    ggtitle("Top 10 States with the Lowest Rate of ICU Beds Availability")
-  
-  ggplot(icu_df, mapping=aes(x=`Potential ICU Beds Available`, y=`ICU Beds Available`))+
-    geom_point(mapping=aes(color = State))+
-    geom_smooth(method=lm)+
-    ggtitle("Linear Regression Model of ICU: Potential Available Beds vs Available Beds")
-  
-```
-
