@@ -199,9 +199,8 @@ states_pop_df %>%
 ``` {r mostatriskstates}
 states_pop_df <- states_pop_df %>% 
   mutate(Risk_Level = (Projected_Hospitalized_Individuals + `Population 65+`) / Adult_Population) %>%
-  arrange(desc(Risk_Level)) %>%
-  slice(1:10)
+  arrange(desc(Risk_Level))
 
-selectstates_pop_df
+select(states_pop_df, State, Risk_Level)
 
 ```
