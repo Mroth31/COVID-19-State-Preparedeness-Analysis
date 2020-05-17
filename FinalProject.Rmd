@@ -62,6 +62,35 @@ df$`Occupied ICU Beds percentage` <- round(df$calc_ICU$`Available ICU Beds`, dig
 #final columns re-arrangement
 df <- df[c(1,2,3,4,5,15,6,7,8,17,9,10,11,12,13)]
 ```
+## Section:
+Create a data frame focusing on the estimated COVID-19 General Population Data. 
+Take the Region data and turn it into statewide data. 
+Once we have statewide data, we multiply the Projected infections, hospitalizations, 
+and ICU admittances by 3 to represent a doomsday scenario where 60 percent of adults 
+get the virus rather than 20 percent in the original data frame. 
+This represents a 200 percent increase in projected cases but is a plausible scenario.
+Create a Scatter Plot showing which states have the highest percentage of elderly adults as 
+part of their adult population.
+
+``` {r popdataframe}
+pop_df <- df %>% select(Town, State, `Adult Population`, `Population 65+`, `Projected Infected Individuals`, `Projected Hospitalized Individuals`, `Projected Individuals Needing ICU Care`)
+
+states_pop_df <- pop_df %>% 
+  group_by(State) %>%
+  summarize(Adult_Population = sum(`Adult Population`), `Population 65+` = sum(`Population 65+`), Projected_Infected_Individuals = sum(`Projected Infected Individuals`), Projected_Hospitalized_Individuals = sum(`Projected Hospitalized Individuals`), Projected_ICU_Care = sum(`Projected Individuals Needing ICU Care`))
+
+states_pop_df <- states_pop_df %>%
+  mutate(DoomsDay_Projected_Infected_Individuals = Projected_Infected_Individuals * 3, Doomsday_Projected_Hospitalized_Individuals = Projected_Hospitalized_Individuals *3, Doomsday_Projected_ICU_Care = Projected_ICU_Care * 3)
+
+
+states_pop_df %>%
+  mutate(Percentage_Adults_Older_65 = (`Population 65+` / Adult_Population) * 100) %>%
+  ggplot(mapping=aes(x=Percentage_Adults_Older_65, y= Adult_Population, color = State))+
+  geom_point()+
+  labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", y="Number of Adults")
+  
+```
+
 
 
 
