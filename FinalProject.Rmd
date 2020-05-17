@@ -211,6 +211,7 @@ states_pop_df <- states_pop_df %>%
 select(states_pop_df, State, Risk_Level)
 ```
 
+<<<<<<< HEAD
 ```{r machine learning setup}
  
     
@@ -218,3 +219,30 @@ select(states_pop_df, State, Risk_Level)
 
 
 
+=======
+## Calculating Risk Factor to predict the risk factor in each state. The 4 dependent variables will be rate of hospital availability, rate of ICU bed availability, Percentage adult population that is 65+, and avg of projected infected and projected_doomsday infected.Then
+
+``` {r calculatingriskfactor}
+
+merge_df <- merge_df %>% 
+  mutate(Preparedness_Score = ((`Population 65+`/Adult_Population)*.3 +
+                          ((`Rate of Hospital beds availability`/100) + 
+                          (`Rate of ICU beds availability`/100)) *.70)*100)
+
+fit_df <- select(merge_df, State, `Rate of Hospital beds availability`, 
+`Rate of ICU beds availability`, Adult_Population, `Population 65+`, Preparedness_Score)
+
+fit_df <- fit_df %>%
+  mutate(Percentage_65_older = (`Population 65+` / Adult_Population) * 30, 
+  Hospital_Bed_Availability = ((`Rate of Hospital beds availability`/100) + 
+  (`Rate of ICU beds availability`/100))*70)
+
+fit <- glm(fit_df, Preparedness_Score ~ Percentage_65_older + Hospital_Bed_Availability, 
+family = "binomial")
+
+
+
+  
+
+```
+>>>>>>> f776694a7e4140d5f5e67b8b6e0bded84823aed1
