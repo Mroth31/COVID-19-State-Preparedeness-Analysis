@@ -211,3 +211,10 @@ states_pop_df <- states_pop_df %>%
 select(states_pop_df, State, Risk_Level)
 ```
 
+```{r machine learning setup}
+ 
+    
+```
+
+
+
