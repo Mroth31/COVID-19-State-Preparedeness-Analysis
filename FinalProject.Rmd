@@ -26,6 +26,8 @@ https://www.kaggle.com/mrmorj/hospital-bed-capacity-and-covid19
 ``` {r libraries}
 library(tidyverse)
 library(lubridate)
+library(dplyr)
+library(broom)
 ```
 
 
@@ -211,15 +213,7 @@ states_pop_df <- states_pop_df %>%
 select(states_pop_df, State, Risk_Level)
 ```
 
-<<<<<<< HEAD
-```{r machine learning setup}
- 
-    
-```
 
-
-
-=======
 ## Calculating Risk Factor to predict the risk factor in each state. The 4 dependent variables will be rate of hospital availability, rate of ICU bed availability, Percentage adult population that is 65+, and avg of projected infected and projected_doomsday infected.Then
 
 ``` {r calculatingriskfactor}
@@ -229,6 +223,11 @@ merge_df <- merge_df %>%
                           ((`Rate of Hospital beds availability`/100) + 
                           (`Rate of ICU beds availability`/100)) *.70)*100)
 
+lm_df <- merge_df %>%
+    select(1, 2, 6, 10, 13, 16, 19)%>%
+    arrange(merge_df$Preparedness_Score)
+lm_df
+
 fit_df <- select(merge_df, State, `Rate of Hospital beds availability`, 
 `Rate of ICU beds availability`, Adult_Population, `Population 65+`, Preparedness_Score)
 
@@ -237,12 +236,22 @@ fit_df <- fit_df %>%
   Hospital_Bed_Availability = ((`Rate of Hospital beds availability`/100) + 
   (`Rate of ICU beds availability`/100))*70)
 
-fit <- glm(fit_df, Preparedness_Score ~ Percentage_65_older + Hospital_Bed_Availability, 
-family = "binomial")
+
+lm_df <- glm(Preparedness_Score ~ Percentage_65_older + Hospital_Bed_Availability, data=fit_df)
+broom::tidy(lm_df)
+lm_df%>%
+  tidy()%>%
+  knitr::kable(digits=4)
 
 
+ggplot(lm_df, mapping=aes(x=lm_df$residuals , y=lm_df$fitted.values))+
+    geom_point(mapping=aes(color = lm_df$data$State))+
+    geom_smooth(method=lm)+
+    labs(title="Linear Regression model of Residuals over fitted values",
+        x = "Fitted values",
+         y = "Residuals",
+        color = "State")
 
-  
-
+# Reached 124 lines of code
 ```
->>>>>>> f776694a7e4140d5f5e67b8b6e0bded84823aed1
+
