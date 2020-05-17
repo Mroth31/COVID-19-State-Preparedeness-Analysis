@@ -168,3 +168,13 @@ states_pop_df %>%
   labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", y="Number of Adults")
   
 ```
+
+
+```{r merge}
+  merge_df <- merge(beds_df, states_pop_df, by="State")
+```
+
+
+
+
+
