@@ -46,7 +46,7 @@ df
 df$State <- str_extract(df$HRR, "([A-Z]{2})")
 
 #extract the town as a separate column from HRR
-df$Town <- str_extract (df$HRR, "[A-Za-z]+")
+df$Town <- sub(", [A-Z]{2}$", "", df$HRR)
 
 #re-arrange the columns to make the data more presentable
 df <- df[c(14,13,2,4,5,3,6,7,8,9,10,11,12)]
@@ -61,7 +61,80 @@ df$`Occupied ICU Beds percentage` <- round(df$calc_ICU$`Available ICU Beds`, dig
 
 #final columns re-arrangement
 df <- df[c(1,2,3,4,5,15,6,7,8,17,9,10,11,12,13)]
+head(df)
+```
+
+## Data Analysis
+```{r analysis setup hospital and icu}
+
+beds_df <- df %>%
+  select(1:10)%>%
+  group_by(State)%>%
+  summarize(`No. of Regions` = n_distinct(Town),
+            `Total Hospital Beds` = sum(`Total Hospital Beds`), 
+            `Hospital Beds Available` = sum(`Available Hospital Beds`),
+            `Potential Hospital Beds Available` = sum(`Potentially Available Hospital Beds*`),
+            `Total ICU Beds` = sum(`Total ICU Beds`), 
+            `ICU Beds Available` = sum(`Available ICU Beds`),
+            `Potential ICU Beds Available` = sum(`Potentially Available ICU Beds*`)
+            )%>%
+  mutate(`Rate of Hospital beds availability` = (`Hospital Beds Available`/`Total Hospital Beds`)*100)%>%
+  mutate(`Rate of ICU beds availability` = (`ICU Beds Available`/`Total ICU Beds`)*100)%>%
+  select(1,2,3,4,5,9,6,7,8,10)%>%
+  arrange(State)
+beds_df
+beds_df$`Rate of Hospital beds availability` = round(beds_df$`Rate of Hospital beds availability`, digits=2)
+beds_df$`Rate of ICU beds availability` = round(beds_df$`Rate of ICU beds availability`, digits=2)
+```
+
+```{r plot analysis hospital}
+  hosp_df <- beds_df %>%
+    select(1:6)%>%
+    group_by(State, `No. of Regions`)%>%
+    arrange(`Rate of Hospital beds availability`)
+  hosp_df
+  
+  ggplot(hosp_df, mapping=aes(x=`Total Hospital Beds`, y=`Hospital Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    ggtitle("Scatter plot of Hospital Beds Occupied vs Available")
+  
+  hosp_df[1:10,] %>%
+    ggplot(mapping=aes(x=State, y=`Rate of Hospital beds availability`, fill= `No. of Regions`))+
+    geom_col(mapping=aes())+
+    ggtitle("Top 10 States with the Lowest Rate of Hospital Beds Availability")
+  
+  ggplot(hosp_df, mapping=aes(x=`Potential Hospital Beds Available`, y=`Hospital Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    geom_smooth(method=lm)+
+    ggtitle("Linear Regression Model of Hospital: Potential Available Beds vs Available Beds")
+  
+  
 ```
 
 
+
+
+
+```{r plot analysis icu}
+  icu_df <- beds_df %>%
+    select(1,2,7,8,9,10)%>%
+    group_by(State, `No. of Regions`)%>%
+    arrange(`Rate of ICU beds availability`)
+  icu_df
+  
+  ggplot(icu_df, mapping=aes(x=`Total ICU Beds`, y=`ICU Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    ggtitle("Scatter plot of ICU Beds Occupied vs Available")
+  
+  icu_df[1:10,] %>%
+    ggplot(mapping=aes(x=State, y=`Rate of ICU beds availability`, fill= `No. of Regions`))+
+    geom_col(mapping=aes())+
+    ggtitle("Top 10 States with the Lowest Rate of ICU Beds Availability")
+  
+  ggplot(icu_df, mapping=aes(x=`Potential ICU Beds Available`, y=`ICU Beds Available`))+
+    geom_point(mapping=aes(color = State))+
+    geom_smooth(method=lm)+
+    ggtitle("Linear Regression Model of ICU: Potential Available Beds vs Available Beds")
+  
+```
 
