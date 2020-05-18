@@ -240,21 +240,40 @@ select(states_pop_df, State, Risk_Level)
 ## Part 5: Merging the Two Data Frames To Calculate a Preparedness Score
 
 ## Step 1: 
-Merge the beds data frame from parts 2 and 3 with the population data frame from part 4.
+We merged the beds data frame from parts 2 and 3 with the population data frame from part 4.
 
 ```{r merge}
   merge_df <- merge(beds_df, states_pop_df, by="State")
 ```
 
 
-## Calculating Risk Factor to predict the risk factor in each state. The 4 dependent variables will be rate of hospital availability, rate of ICU bed availability, Percentage adult population that is 65+, and avg of projected infected and projected_doomsday infected.Then
+## Step 2: 
 
-``` {r calculatingriskfactor}
+In order to quantify which states were the most prepared and which states were the least prepared, 
+we used the merged dataset to calculate a preparedness score. In order to calculate the score, we 
+derived a formula that uses the percentage of population 65 and older, the rate of hospital bed 
+availability, and the rate of ICU bed availability. We felt that these factors differentiated the states 
+the most and concluded that the rate of available hospital and ICU beds was more than twice as important 
+as the percentage of elderly population in a state. This formula produced a score on a scale of 0 to 100
+and is represented by the continuous attribute "preparedness_score". The states who were the most prepared 
+had scores in the 65-90 range, while the states who were the least prepared had scores in the 43-55 range. 
+
+``` {r step2}
 
 merge_df <- merge_df %>% 
   mutate(Preparedness_Score = ((`Population 65+`/Adult_Population)*.3 +
                           ((`Rate of Hospital beds availability`/100) + 
                           (`Rate of ICU beds availability`/100)) *.70)*100)
+
+merge_df
+```
+
+## Step 3: 
+Once we calculated our preparedness_score, we created a separate data frame to prepare for Logistic Regression.
+This data frame includes all of the pertinent variables in our regression model, including the building blocks 
+for the calculation of each preparedness_score.
+
+``` {r step3}
 
 fit_df <- select(merge_df, State, `Rate of Hospital beds availability`, 
 `Rate of ICU beds availability`, Adult_Population, `Population 65+`, Preparedness_Score)
@@ -264,13 +283,29 @@ fit_df <- fit_df %>%
   Hospital_Bed_Availability = ((`Rate of Hospital beds availability`/100) + 
   (`Rate of ICU beds availability`/100))*70)
 
+```
+## Step 4:
+We perform logistic regression using the fit_df created in step 3. The purpose of doing this is to
+quantify the relationship between preparedness_scores and the two independent variables. The 
+preparedness score is the dependent variable whilethe Percentage_65_older and the Hospital_Bed_Availability 
+are the independent variables. Using the broom library, the tidy function with our model produces a p value 
+of 0.25, which tells us that our relationship is relatively strong, but not strong enough to be statistically 
+significant.
 
+``` {r step4}
 lm_df <- glm(Preparedness_Score ~ Percentage_65_older + Hospital_Bed_Availability, data=fit_df)
 broom::tidy(lm_df)
 lm_df%>%
   tidy()%>%
   knitr::kable(digits=4)
 
+```
+
+## Step 5:
+We used the results of the logistic regression to graph the residuals versus the fitted values. Our residuals 
+appear to skew a little below zero, but they are within a reasonable range of zero.
+
+``` {r step5}
 
 ggplot(lm_df, mapping=aes(x=lm_df$residuals , y=lm_df$fitted.values))+
     geom_point(mapping=aes(color = lm_df$data$State))+
@@ -285,6 +320,8 @@ ggplot(lm_df, mapping=aes(x=lm_df$residuals , y=lm_df$fitted.values))+
 fit_df$fitted_values <- lm_df$fitted.values
 
 ```
+
+## Part 6: Visually Depicting the Tiers of Preparedness_Score
 
 ```{r map}
 #https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
