@@ -33,7 +33,7 @@ library(leaflet)
 
 
 
-## Dataframe Setup and Tidying
+## Part 1 Dataframe Setup and Tidying
 
 ```{r setup}
 csv_file <- "HRR_Scorecard.csv"
@@ -67,7 +67,7 @@ df <- df[c(1,2,3,4,5,15,6,7,8,17,9,10,11,12,13)]
 head(df)
 ```
 
-## Data Analysis
+## Part 2 Data Analysis With a Focus on Hospital and ICU Bed Capacity
 ```{r analysis setup hospital and icu}
 
 beds_df <- df %>%
@@ -143,21 +143,28 @@ beds_df$`Rate of ICU beds availability` = round(beds_df$`Rate of ICU beds availa
 
 
 
-## Population Data Frame:
-Create a data frame focusing on the estimated COVID-19 General Population Data. 
-Take the Region data and turn it into statewide data. 
-Once we have statewide data, we multiply the Projected infections, hospitalizations, 
-and ICU admittances by 3 to represent a doomsday scenario where 60 percent of adults 
-get the virus rather than 20 percent in the original data frame. 
-This represents a 200 percent increase in projected cases but is a plausible scenario.
-Create a Scatter Plot showing which states have the highest percentage of elderly adults as 
-part of their adult population.
+## Part 4: Data Analysis with a Focus on State Population and Projected Infection Rates
+The purpose of this section is to take the entire dataset and use it to create a smaller 
+dataset that focuses on the population.
 
-``` {r popdataframe}
+## Step 1: 
+Obtain this smaller dataset that includes Town, State, Adult 
+Population, Population 65+, Projected Infected Individual, 
+Projected Hospitalized Individuals, and Projected Individuals Needing ICU Care. 
+
+``` {r step1}
 pop_df <- df %>% select(Town, State, `Adult Population`, `Population 65+`, 
 `Projected Infected Individuals`, `Projected Hospitalized Individuals`, 
 `Projected Individuals Needing ICU Care`)
+```
 
+## Step 2:
+Turn the region data into statewide data by grouping by state and using summarize to 
+add the totals for each state. The statewide data allows the opportunity to compare the 
+risks that states are facing based on total population. The dataset contains all of the 
+large regional hospitals, so we felt that the transition to statewide data would be seamless. 
+
+``` {r step2}
 states_pop_df <- pop_df %>% 
   group_by(State) %>%
   summarize(Adult_Population = sum(`Adult Population`), 
@@ -165,34 +172,30 @@ states_pop_df <- pop_df %>%
   Projected_Infected_Individuals = sum(`Projected Infected Individuals`), 
   Projected_Hospitalized_Individuals = sum(`Projected Hospitalized Individuals`), 
   Projected_ICU_Care = sum(`Projected Individuals Needing ICU Care`))
+```
+
+## Step 3:
+Once statewide data exists, we next wanted to show how much the risk would increase if 60 percent 
+of the adult population contracted the virus in each state. In order to provide a snapshot, we 
+tripled the number of Projected Infected Individuals, Projected Hospitalized Individuals, and 
+Projected Individuals Needing ICU Care. This represents a 200 percent increase in each category 
+over the original twenty percent. This is a plausible estimate according to various projection models.
+
+``` {r step3}
 
 states_pop_df <- states_pop_df %>%
   mutate(DoomsDay_Projected_Infected_Individuals = Projected_Infected_Individuals * 3, 
   Doomsday_Projected_Hospitalized_Individuals = Projected_Hospitalized_Individuals *3, 
   Doomsday_Projected_ICU_Care = Projected_ICU_Care * 3)
 
-
-states_pop_df %>%
-  mutate(Percentage_Adults_Older_65 = (`Population 65+` / Adult_Population) * 100) %>%
-  ggplot(mapping=aes(x=Percentage_Adults_Older_65, y= Adult_Population, color = State))+
-  geom_point()+
-  labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", 
-  y="Number of Adults")
-  
 ```
+## Step 4: 
+After doing this, we created a scatterplot showing the difference in the number of hospitalizations
+with the exact same adult population to emphasize how much worse this plausible scenario could make 
+the situation. This scatterplot highlighted the risks that higher population states face if they aren’t 
+properly equipped. 
 
-
-```{r merge}
-  merge_df <- merge(beds_df, states_pop_df, by="State")
-```
-
-
-=======
-## Doomsday Plot:
-I would like to depict the differences in projected hospitilizations in the 
-doomsday scenario for each state.
-
-``` {r doomsdayplot}
+``` {r step4}
 states_pop_df %>%
   mutate(difference_in_hospitilzations = 
   Doomsday_Projected_Hospitalized_Individuals - Projected_Hospitalized_Individuals) %>%
@@ -202,16 +205,45 @@ states_pop_df %>%
   x="Difference", y="Number of Adults")
   
   
-```  
+``` 
 
-## Top 10 States Most at Risk Based on the sum of Total Adult Population / Projected Hospitilizations and Elderly Population / Adult Population 
+## Step 5: 
+When focusing solely on population, one of the most important things to consider is the proportion 
+of people who are older than 65. It is well known that this demographic is at highest risk for this 
+virus as they are much more likely to be hospitalized when they contract the virus. In order to depict 
+this across the fifty states, we created a scatterplot with the adult population mapped to the y-axis 
+and the percentage of adults older than 65 on the x axis for each state.  
 
-``` {r mostatriskstates}
+``` {r step5}
+states_pop_df %>%
+  mutate(Percentage_Adults_Older_65 = (`Population 65+` / Adult_Population) * 100) %>%
+  ggplot(mapping=aes(x=Percentage_Adults_Older_65, y= Adult_Population, color = State))+
+  geom_point()+
+  labs(title = "Percentage of Adults Older than 65 In Each State", x="Percentage", 
+  y="Number of Adults")
+  
+```
+## Step 6:
+Furthermore, we used the proportion of adult population and the projected number of hospitalizations 
+to calculate a risk level by state just according to the population. The purpose of this is to depict how 
+a more frequent older population puts a state at risk. When you combine that with questionable hospital 
+supplies, a state can be in major trouble.  
+
+``` {r step6}
 states_pop_df <- states_pop_df %>% 
   mutate(Risk_Level = (Projected_Hospitalized_Individuals + `Population 65+`) / Adult_Population) %>%
   arrange(desc(Risk_Level))
 
 select(states_pop_df, State, Risk_Level)
+```
+
+## Part 5: Merging the Two Data Frames To Calculate a Preparedness Score
+
+## Step 1: 
+Merge the beds data frame from parts 2 and 3 with the population data frame from part 4.
+
+```{r merge}
+  merge_df <- merge(beds_df, states_pop_df, by="State")
 ```
 
 
