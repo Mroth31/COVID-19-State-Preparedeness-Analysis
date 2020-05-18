@@ -1,7 +1,7 @@
 ---
 title: "FinalProject"
 author: "Ajay Karatam and Michael Rothschilds"
-date: "5/13/2020"
+date: "May 13th 2020"
 output: html_document
 ---
 ## An Analysis of U.S Hospital Bed Capacity During the COVID-19 Pandemic
